@@ -1,0 +1,139 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{geometry}
+\usepackage{tikz}
+\usepackage{pgf-umlcd}
+\usetikzlibrary{positioning, shapes, arrows}
+\geometry{margin=1in}
+\title{Dynamic System for BRAC University's Office of Co-curricular Activities (OCA)}
+\author{Ansari Abrar}
+\date{29 October 2024}
+\begin{document}
+\maketitle
+\section{Overview}
+This is an online platform that aims to ease the collaboration, approval process and the organisation of event activity between BRAC University office Co-curricular Activities (OCA) with their clubs. The website will also streamline the current process of event approvals, budget requests and club communication to reduce reliance on paper forms and email back-end exchanges.
+\section{System Architecture}
+\subsection{Technologies}
+\begin{itemize}
+    \item \textbf{Frontend:}
+    \begin{itemize}
+        \item HTML and CSS: HTML to build the structure of the web pages, and CSS for styling and responsive design.
+        \item Java: Using Java Servlets and JSP for creating interactive web pages and forms for users.
+    \end{itemize}
+    \item \textbf{Backend:}
+    \begin{itemize}
+        \item Java: Java Servlets will handle requests, manage session data, and process approvals and budget requests.
+        \item Python: Python will handle automated tasks, such as sending notifications and generating analytics, called from Java as needed.
+    \end{itemize}
+    \item \textbf{Database:} MySQL will be used for relational data storage, tracking users, events, budgets, and permissions. Java Database Connectivity (JDBC) will interact with SQL for smooth data management.
+    \item \textbf{Security:} JSON Web Tokens (JWT) will be used for secure, role-based access, with permissions varying for admins, leaders, and members.
+\end{itemize}
+\section{Standardization Strategy}
+\begin{itemize}
+    \item Java classes and SQL tables will define user roles, club structures, and permissions.
+    \item Event and budget management will be handled through standardized Java workflows, with data storage managed in SQL.
+    \item An approval flow for events and budgets will be implemented, enabling automatic routing based on roles defined in the database.
+\end{itemize}
+\section{Feature Details}
+\subsection{Dashboard}
+Club-specific and OCA-specific dashboards will be created using JSP and Java. Data will be fetched using Java and displayed based on user roles (admin, club leader, or member).
+\subsection{Event and Budget Management}
+Clubs can submit events and budgets stored in SQL and manage them through Java. Java will handle the approval process, status updates, and notifications.
+\subsection{Room Booking and Resource Allocation}
+An SQL-based calendar will store and track room availability, with Java managing the update and request process.
+\subsection{Real-Time Notifications}
+Java's email API will send email notifications for updates, approvals, and reminders in real time.
+\subsection{Data Analytics}
+Python scripts will aggregate data in SQL, generate reports, and display them on the OCA dashboard for easy viewing.
+\section{Diagrams}
+\subsection{UML Diagram}
+\begin{tikzpicture}
+    \begin{class}[text width=5cm]{User}{0,0}
+        \attribute{+ userID: int}
+        \attribute{+ name: String}
+        \attribute{+ email: String}
+        \attribute{+ role: String}
+        \operation{+ submitBudgetRequest()}
+        \operation{+ requestRoomBooking()}
+    \end{class}
+    \begin{class}[text width=5cm]{Club}{-6,-4}
+        \attribute{+ clubID: int}
+        \attribute{+ name: String}
+        \attribute{+ presidentID: int}
+        \operation{+ manageEvents()}
+        \operation{+ manageMembers()}
+    \end{class}
+    \begin{class}[text width=5cm]{Event}{6,-4}
+        \attribute{+ eventID: int}
+        \attribute{+ title: String}
+        \attribute{+ date: Date}
+        \attribute{+ location: String}
+        \operation{+ approveEvent()}
+    \end{class}
+    \begin{class}[text width=5cm]{BudgetRequest}{0,-8}
+        \attribute{+ requestID: int}
+        \attribute{+ amount: double}
+        \attribute{+ status: String}
+        \operation{+ approveBudget()}
+        \operation{+ rejectBudget()}
+    \end{class}
+    \draw[->] (User) -- node[pos=0.7, above right] {submits} (BudgetRequest);
+    \draw[->] (User) -- node[above right] {requests} (Event);
+    \draw[->] (Club) -- node[below left] {hosts} (Event);
+    \draw[->] (User) -- node[above left] {administers} (Club);
+\end{tikzpicture}
+\subsection{ER Diagram}
+\begin{tikzpicture}
+    \tikzstyle{entity} = [rectangle, draw, fill=blue!20, text centered, minimum height=2em, minimum width=4em]
+    \tikzstyle{relationship} = [diamond, draw, fill=green!20, text centered, aspect=2, minimum height=2em, minimum width=3em]
+    \tikzstyle{attribute} = [ellipse, draw, fill=yellow!20, text centered, minimum height=2em, minimum width=4em]
+    \node[entity] (User) at (0,0) {User};
+    \node[entity] (Club) at (-6,-4) {Club};
+    \node[entity] (Event) at (6,-4) {Event};
+    \node[entity] (BudgetRequest) at (0,-8) {BudgetRequest};
+    \node[relationship] (submits) at (0,-4) {Submits};
+    \node[relationship] (hosts) at (-3,-4) {Hosts};
+    \node[relationship] (requests) at (3,-4) {Requests};
+    \node[relationship] (approves) at (3,-8) {Approves};
+    \node[attribute] (userID) at (-2,0.5) {userID};
+    \node[attribute] (name) at (0,1) {name};
+    \node[attribute] (email) at (2,1) {email};
+    \node[attribute] (role) at (0,2) {role};
+    \node[attribute] (phoneNumber) at (-3,2) {phoneNumber};
+    \node[attribute] (position) at (2,2) {position};
+    \draw (User) -- (userID);
+    \draw (User) -- (name);
+    \draw (User) -- (email);
+    \draw (name) -- (role);
+    \draw (User) -- (phoneNumber);
+    \draw (User) -- (position);
+    \node[attribute] (clubID) at (-8,-3) {clubID};
+    \node[attribute] (clubName) at (-8,-5) {name};
+    \draw (Club) -- (clubID);
+    \draw (Club) -- (clubName);
+    \node[attribute] (eventID) at (8,-3) {eventID};
+    \node[attribute] (title) at (8,-5) {title};
+    \node[attribute] (date) at (6,-6) {date};
+    \node[attribute] (location) at (4,-5) {location};
+    \draw (Event) -- (eventID);
+    \draw (Event) -- (title);
+    \draw (Event) -- (date);
+    \draw (Event) -- (location);
+    \node[attribute] (requestID) at (2,-7) {requestID};
+    \node[attribute] (amount) at (2,-9) {amount};
+    \node[attribute] (status) at (-2,-7) {status};
+    \draw (BudgetRequest) -- (requestID);
+    \draw (BudgetRequest) -- (amount);
+    \draw (BudgetRequest) -- (status);
+    \draw (User) -- (submits);
+    \draw (submits) -- (BudgetRequest);
+    \draw (Club) -- (hosts);
+    \draw (hosts) .. controls (1, 3) and (2, -4) .. (Event);
+    \draw (User) -- (requests);
+    \draw (requests) -- (Event);
+    \draw (BudgetRequest) -- (approves);
+    \draw (approves) -- (Event);
+\end{tikzpicture}
+\end{document}
